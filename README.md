@@ -18,3 +18,6 @@ pypopsift资源，地址https://github.com/OpenDroneMap/pypopsift
 2. 资源自带了一个pybind11，但这个pybind11是2.5版本，远远落后于现在的2.13（现在甚至有3.0.0版本），因此其针对的python版本也较低，无法支持python3.12/3.13这样的新版本，因此需要下载pybind11的新的release版本源码，替换其初始的低版本pybind11。
 3. 部分代码存在bug，主要是thurst库的一些依赖没有显式包含，需要添加s_filtergrid.cu文件里面的#include内容。
 经过以上几处修改，才能保证make成功。
+
+经过几小时的折腾，pypopsift这个库最后还是没能正常工作。我打算尝试自己用pybind11从CUDASIFT资源制作可以被python调用的cuda包。
+需要注意的是，在conda环境中，libstdc++.so.6 version `GLIBCXX_3.4.30' not found问题比较明显。因为c++版本的opencv会使用这个库，而C++版本的opencv是在非conda的本机环境使用的，所以需要让conda使用本机的libstdc++。这里使用一种方法。在$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh中增加export OLD_LD_PRELOAD="$LD_PRELOAD"和export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6:$LD_PRELOAD。在$CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh中增加export LD_PRELOAD="$OLD_LD_PRELOAD" unset OLD_LD_PRELOAD的方式，使得在使用conda activate和deactivate动作时，自动加入和去掉本机环境的libstdc++环境。
