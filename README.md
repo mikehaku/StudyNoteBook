@@ -23,7 +23,7 @@ pypopsift资源，地址https://github.com/OpenDroneMap/pypopsift
 需要注意的是，在conda环境中，libstdc++.so.6 version `GLIBCXX_3.4.30' not found问题比较明显。因为c++版本的opencv会使用这个库，而C++版本的opencv是在非conda的本机环境使用的，所以需要让conda使用本机的libstdc++。这里使用一种方法。在$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh中增加export OLD_LD_PRELOAD="$LD_PRELOAD"和export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6:$LD_PRELOAD。在$CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh中增加export LD_PRELOAD="$OLD_LD_PRELOAD" unset OLD_LD_PRELOAD的方式，使得在使用conda activate和deactivate动作时，自动加入和去掉本机环境的libstdc++环境。
 
 # 2025年7月11日 基于CUDASIFT的python动态库制作
-经过一周的折腾，终于尘埃落定，使用https://github.com/Celebrandil/CudaSift的CUDA-SIFT代码作为基础，制作了一个没有封装成类的python动态库。（后续我会找时间把做好的新代码放进github仓库。）
+经过一周的折腾，终于尘埃落定，使用https://github.com/Celebrandil/CudaSift 的CUDA-SIFT代码作为基础，制作了一个没有封装成类的python动态库。（后续我会找时间把做好的新代码放进github仓库。）
 1. 如果制作成类，可以实现显存的重复使用，但也可能涉及到构造、析构、内存释放等问题，比较复杂。虽然我很想把CUDA显存做最大化利用，少做开辟和回收的动作，但能力有限、时间有限，只能做成每次计算都开辟和回收显存的程序。
 2. 下面介绍pybind11构建动态库，主要改动只有以下几方面：增加pybind11库、修改main.cpp文件、修改CMakeLists.txt文件，以及增加"xxx_wrapper.cpp"绑定文件。其他程序原有的头文件和源文件完全都没动，也不需要增加CUDA相关的设置。
 3. 在原代码目录中增加了pybind11的文件夹，可以放进external目录里面提示其性质是外部库。
